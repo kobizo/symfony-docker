@@ -130,6 +130,9 @@ RUN set -eux; \
 	docker-php-ext-enable xdebug; \
 	apk del .build-deps
 
+# install yarn & nodejs
+RUN apk --no-cache add nodejs yarn
+
 RUN rm -f .env.local.php
 
 # Build Caddy with the Mercure and Vulcain modules

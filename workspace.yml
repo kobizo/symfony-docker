@@ -1,0 +1,64 @@
+workspace('symfony-docker-bigcommerce-ws'):
+    description: generated local workspace for Symfony Docker BigCommerce learning.
+
+command('setup'):
+    exec: |
+        #!bash(workspace:/)|@
+        docker compose up --build --detach
+        
+        printf "\nBackend component setup...\n"
+        docker exec symfony-docker-bigcommerce-php composer install
+        
+        printf "\nFrontend components setup...\n"
+        docker exec symfony-docker-bigcommerce-php yarn install
+        docker exec symfony-docker-bigcommerce-php yarn encore dev
+
+        printf "\nClearing cache\n"
+        docker exec symfony-docker-bigcommerce-php php bin/console cache:clear
+        printf "Clearing cache completed!\n\n"
+        
+        printf "\nEverything is done!\n"
+        printf "URL: https://localhost/\n"
+        printf "Username: admin@kobizo.com\n"
+        printf "Password: password\n"
+
+command('start'):
+    exec: |
+        #!bash(workspace:/)|@
+        docker-compose start php
+        docker-compose start caddy
+
+command('stop'):
+    exec: |
+        #!bash(workspace:/)|@
+        docker-compose stop php
+        docker-compose stop caddy
+
+command('destroy'):
+    exec: |
+        #!bash(workspace:/)|@
+        run ws stop
+        docker-compose rm -f php
+        docker-compose rm -f caddy
+
+command('restart'):
+    exec: |
+        #!bash(workspace:/)|@
+        run ws stop
+        run ws start
+
+command('console'):
+    exec: |
+        #!bash(workspace:/)|@
+        docker exec -it symfony-docker-bigcommerce-php /bin/sh
+        
+command('frontend build'):
+    exec: |
+        #!bash(workspace:/)|=
+        docker exec symfony-docker-bigcommerce-php yarn install
+        docker exec symfony-docker-bigcommerce-php yarn encore dev
+        
+command('fe build'):
+    exec: |
+        #!bash(workspace:/)|@
+        run ws frontend build
